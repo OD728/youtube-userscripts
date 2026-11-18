@@ -10,7 +10,7 @@ A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.t
 | [Simple Auto-Pause](scripts/youtube-auto-pause.user.js) | Stops videos from autoplaying when opened. Once you click or press a key, it stops interfering. |
 | [Default 1440p](scripts/youtube-default-1440p.user.js) | Picks 1440p quality, or the closest available resolution. Waits for ads to finish first. |
 | [5 Row](scripts/youtube-5-row.user.js) | Shows 5 videos per row on the home and subscriptions grids. CSS only. |
-| [Hide Members Only](scripts/youtube-hide-members-only.user.js) | Hides "Members only" and "Members first" videos from grids and lists. By Superflyin. |
+| [Hide Members Only](scripts/youtube-hide-members-only.user.js) | Hides "Members only" and "Members first" videos from grids and lists. Based on a script by Superflyin. |
 | [Country Flag](scripts/youtube-country-flag.user.js) | Shows the creator's country flag next to channel names, video titles and Shorts. |
 
 ## Install

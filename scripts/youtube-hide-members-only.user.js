@@ -1,19 +1,17 @@
 // ==UserScript==
 // @name         Hide YouTube Members Only Videos
 // @namespace    http://tampermonkey.net/
-// @version      1
+// @version      1.1
 // @description  Cleans up your YouTube grid layouts by completely hiding member-exclusive content
-// @author       Superflyin
+// @author       Superflyin (original), modified
 // @match        https://www.youtube.com/*
 // @grant        none
-// @downloadURL https://update.greasyfork.org/scripts/582181/Hide%20YouTube%20Members%20Only%20Videos.user.js
-// @updateURL https://update.greasyfork.org/scripts/582181/Hide%20YouTube%20Members%20Only%20Videos.meta.js
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    // Using textContent instead of innerHTML cleanly bypasses the Trusted Types security violation
+    // Using textContent instead of innerHTML avoids YouTube's Trusted Types security error
     const style = document.createElement('style');
     style.textContent = `
         ytd-rich-item-renderer.hide-grid-cell,
@@ -23,28 +21,26 @@
             display: none !important;
         }
     `;
-    document.head.appendChild(style);
+    (document.head || document.documentElement).appendChild(style);
 
     const targetTags = ['YTD-RICH-ITEM-RENDERER', 'YTD-GRID-VIDEO-RENDERER', 'YTD-VIDEO-RENDERER', 'YTD-RICH-GRID-MEDIA'];
 
-    const cleanUp = () => {
-        const selectors = [
-            '[class*="BadgeShapeText"]',
-            '[class*="ViewModelTitle"]',
-            '.ytBadgeShapeText',
-            '.yt-badge-shape__text',
-            'badge-shape div',
-            '#video-title',
-            '#video-title-link'
-        ];
+    const selectors = [
+        '[class*="BadgeShapeText"]',
+        '[class*="ViewModelTitle"]',
+        '.ytBadgeShapeText',
+        '.yt-badge-shape__text',
+        'badge-shape div',
+        '#video-title',
+        '#video-title-link'
+    ].join(',');
 
-        const elements = document.querySelectorAll(selectors.join(','));
+    const cleanUp = () => {
         let foundNew = false;
 
-        elements.forEach(el => {
+        document.querySelectorAll(selectors).forEach(el => {
             const text = el.textContent.trim().toLowerCase();
             if (text.includes('members only') || text.includes('members first') || text.includes('[members]')) {
-
                 let card = el.parentElement;
                 while (card && !targetTags.includes(card.tagName)) {
                     card = card.parentElement;
@@ -57,30 +53,29 @@
             }
         });
 
+        // Nudge YouTube to re-flow the grid so there are no gaps
         if (foundNew) {
             window.dispatchEvent(new Event('resize'));
         }
     };
 
-    const observer = new MutationObserver(() => {
-        cleanUp();
-    });
+    // YouTube changes the page constantly. Batch all changes within one
+    // animation frame into a single scan instead of scanning on every change.
+    let scheduled = false;
+    const scheduleCleanUp = () => {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => {
+            scheduled = false;
+            cleanUp();
+        });
+    };
+
+    const observer = new MutationObserver(scheduleCleanUp);
 
     const startScript = () => {
         cleanUp();
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        // Cold boot protection loop
-        let checks = 0;
-        const bootInterval = setInterval(() => {
-            cleanUp();
-            checks++;
-            if (checks > 10) clearInterval(bootInterval);
-        }, 300);
+        observer.observe(document.body, { childList: true, subtree: true });
     };
 
     if (document.body) {
