@@ -22,5 +22,5 @@ A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.t
 ## Notes
 
 - **Country Flag privacy:** this script sends the ID of each video you open to a third-party service (`channel-info.pages.dev`) to look up the country. Results are cached for 7 days.
-- The `improvements` branch has reviewed versions of these scripts with bug fixes. They haven't been tested yet. Try them before replacing the versions here.
+- New versions are prepared on the `improvements` branch and only moved here after they have been tested.
 - These scripts rely on YouTube's page structure, which changes often. If one stops working, the selectors probably need updating.
