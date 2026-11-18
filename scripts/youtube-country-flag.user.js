@@ -2,7 +2,7 @@
 // @name         YouTube Enhancer (Reveal Country Flag Only)
 // @namespace    http://tampermonkey.net/
 // @description  Reveals the Country Flag next to video titles.
-// @version      1.3
+// @version      1.4
 // @match        *://*.youtube.com/*
 // @connect      channel-info.pages.dev
 // @grant        GM_xmlhttpRequest
@@ -72,7 +72,29 @@
         });
     }
 
+    // The service answers "xx" / "Country Not Set" when the creator hasn't set a country.
+    // (The flag library's xx.svg is an almost invisible white box.)
+    function isUnknownCountry(countryData) {
+        return countryData.code === 'xx' || /not set/i.test(countryData.name || '');
+    }
+
+    // What to show when the country is unknown.
+    // Must return an element with className 'yt-country-flag' (so it's removed
+    // when you switch videos), or null to show nothing at all.
+    function createPlaceholder(size, margin, countryData) {
+        const globe = document.createElement('span');
+        globe.textContent = '🌐';
+        globe.className = 'yt-country-flag';
+        globe.style.cssText = `font-size: ${size}; line-height: 1; margin-left: ${margin};`;
+        globe.title = countryData.name || 'Country not set';
+        return globe;
+    }
+
     function createFlag(size, margin, countryData) {
+        if (isUnknownCountry(countryData)) {
+            return createPlaceholder(size, margin, countryData);
+        }
+
         const flag = document.createElement('img');
         flag.src = `${FLAG_CONFIG.BASE_URL}${countryData.code}.svg`;
         flag.className = 'yt-country-flag';
@@ -102,10 +124,13 @@
                 const videoId = new URLSearchParams(window.location.search).get('v');
                 if (videoId) {
                     const countryData = await getCountryData('video', videoId);
-                    if (countryData && countryData.code && stillSamePage()) {
+                    const flag = countryData && countryData.code && stillSamePage()
+                        ? createFlag(FLAG_CONFIG.SIZE, FLAG_CONFIG.MARGIN, countryData)
+                        : null;
+                    if (flag) {
                         videoParent.style.display = 'flex';
                         videoParent.style.alignItems = 'center';
-                        videoParent.appendChild(createFlag(FLAG_CONFIG.SIZE, FLAG_CONFIG.MARGIN, countryData));
+                        videoParent.appendChild(flag);
                     }
                 }
             }
