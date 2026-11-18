@@ -1,10 +1,17 @@
 // ==UserScript==
 // @name         YouTube Simple Auto-Pause
-// @namespace    http://tampermonkey.net/
-// @version      1.1
+// @namespace    https://github.com/OD728
+// @version      1.1.1
 // @description  Prevents YouTube videos from autoplaying when opened.
+// @author       OD728
+// @license      MIT
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @match        *://*.youtube.com/*
 // @grant        none
+// @homepageURL  https://github.com/OD728/youtube-userscripts
+// @supportURL   https://github.com/OD728/youtube-userscripts/issues
+// @downloadURL  https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-auto-pause.user.js
+// @updateURL    https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-auto-pause.user.js
 // ==/UserScript==
 
 (function() {

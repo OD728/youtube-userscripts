@@ -1,14 +1,21 @@
 // ==UserScript==
 // @name         YouTube Enhancer (Reveal Country Flag Only)
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/OD728
+// @version      1.4.1
 // @description  Reveals the Country Flag next to video titles.
-// @version      1.4
+// @author       OD728
+// @license      MIT
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @match        *://*.youtube.com/*
 // @connect      channel-info.pages.dev
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
+// @homepageURL  https://github.com/OD728/youtube-userscripts
+// @supportURL   https://github.com/OD728/youtube-userscripts/issues
+// @downloadURL  https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-country-flag.user.js
+// @updateURL    https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-country-flag.user.js
 // ==/UserScript==
 
 (function () {

@@ -1,14 +1,19 @@
 // ==UserScript==
 // @name         YouTube 5 Row
-// @namespace    http://tampermonkey.net/
-// @version      2.0
+// @namespace    https://github.com/OD728
+// @version      2.0.1
 // @description  Forces 5 videos per row on YouTube. Optimized for performance by relying strictly on CSS.
-// @author       Dean (Modified)
+// @author       OD728 (based on work by Dean)
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @match        *://*.youtube.com/*
 // @exclude      *://*.youtube.com/tv*
 // @exclude      *://*.youtube.com/embed/*
 // @grant        GM_addStyle
 // @run-at       document-start
+// @homepageURL  https://github.com/OD728/youtube-userscripts
+// @supportURL   https://github.com/OD728/youtube-userscripts/issues
+// @downloadURL  https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-5-row.user.js
+// @updateURL    https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-5-row.user.js
 // ==/UserScript==
 
 (function () {

@@ -1,12 +1,18 @@
 // ==UserScript==
 // @name         YouTube Default 1440p
-// @namespace    http://tampermonkey.net/
-// @version      1.2
+// @namespace    https://github.com/OD728
+// @version      1.2.1
 // @description  Automatically sets YouTube video quality to 1440p or the closest available high resolution.
-// @match        https://www.youtube.com/*
+// @author       OD728
+// @license      MIT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
+// @match        https://www.youtube.com/*
 // @grant        none
 // @run-at       document-end
+// @homepageURL  https://github.com/OD728/youtube-userscripts
+// @supportURL   https://github.com/OD728/youtube-userscripts/issues
+// @downloadURL  https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-default-1440p.user.js
+// @updateURL    https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-default-1440p.user.js
 // ==/UserScript==
 
 (function() {

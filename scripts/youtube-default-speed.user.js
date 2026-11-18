@@ -1,11 +1,18 @@
 // ==UserScript==
 // @name         YouTube Default Speed 1.30x
-// @namespace    http://tampermonkey.net/
-// @version      1.3.1
+// @namespace    https://github.com/OD728
+// @version      1.3.2
 // @description  Sets YouTube playback speed to 1.30x on each new video (excludes Music and Live). Manual speed changes are respected.
+// @author       OD728
+// @license      MIT
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @match        *://*.youtube.com/*
 // @exclude      *://music.youtube.com/*
 // @grant        none
+// @homepageURL  https://github.com/OD728/youtube-userscripts
+// @supportURL   https://github.com/OD728/youtube-userscripts/issues
+// @downloadURL  https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-default-speed.user.js
+// @updateURL    https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-default-speed.user.js
 // ==/UserScript==
 
 (function() {
