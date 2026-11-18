@@ -12,6 +12,7 @@ A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.t
 | [5 Row](scripts/youtube-5-row.user.js) | Shows 5 videos per row on the home and subscriptions grids. CSS only. |
 | [Hide Members Only](scripts/youtube-hide-members-only.user.js) | Hides "Members only" and "Members first" videos from grids and lists. Based on a script by Superflyin. |
 | [Hide Shorts & Playables](scripts/youtube-hide-shorts-playables.user.js) | Hides Shorts (shelves, results, menu entry, channel tab) and the YouTube Playables games shelf. Shorts links open as normal videos. |
+| [Clean Sidebar](scripts/youtube-clean-sidebar.user.js) | Hides "Explore", "More from YouTube", "Report history" and the footer links from the left sidebar. |
 | [Country Flag](scripts/youtube-country-flag.user.js) | Shows the creator's country flag next to video titles, or 🌐 if the creator hasn't set a country. |
 
 ## Install
