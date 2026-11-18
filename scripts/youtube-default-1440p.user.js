@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Default 1440p
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Automatically sets YouTube video quality to 1440p or the closest available high resolution.
 // @match        https://www.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
@@ -27,6 +27,14 @@
 
         // #movie_player is the main player (not a home-page hover preview)
         const player = document.getElementById('movie_player');
+
+        // During an ad, the player reports the ad's qualities, not the video's.
+        // Wait for the ad to finish (this doesn't use up retries).
+        if (player && player.classList.contains('ad-showing')) {
+            setTimeout(() => setVideoQuality(attempt), 1000);
+            return;
+        }
+
         const available = player && typeof player.getAvailableQualityLevels === 'function'
             ? player.getAvailableQualityLevels()
             : [];
@@ -50,7 +58,15 @@
     // Runs on first load and on every YouTube in-app navigation
     function onNavigate() {
         const videoId = new URLSearchParams(window.location.search).get('v');
-        if (videoId && videoId !== lastVideoId) {
+
+        // Left the watch page: forget the last video, so opening the
+        // same video again later still sets the quality.
+        if (!videoId) {
+            lastVideoId = '';
+            return;
+        }
+
+        if (videoId !== lastVideoId) {
             lastVideoId = videoId;
             setTimeout(() => setVideoQuality(), 1000); // wait for the player to spin up
         }
