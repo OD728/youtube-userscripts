@@ -1,8 +1,10 @@
 // ==UserScript==
 // @name         YouTube Enhancer (Reveal Country Flag Only)
-// @description  Reveals the Country Flag next to channel names and video titles.
-// @version      1.0
+// @namespace    http://tampermonkey.net/
+// @description  Reveals the Country Flag next to video titles.
+// @version      1.4
 // @match        *://*.youtube.com/*
+// @connect      channel-info.pages.dev
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -14,8 +16,8 @@
 
     const FLAG_CONFIG = {
         BASE_URL: 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/flags/4x3/',
-        SIZES: { channel: '28px', video: '22px', shorts: '20px' },
-        MARGINS: { channel: '12px', video: '10px', shorts: '8px' }
+        SIZE: '22px',
+        MARGIN: '10px'
     };
 
     const CACHE_CONFIG = {
@@ -26,11 +28,15 @@
     const processedElements = new Set();
 
     function getFromCache(type, id) {
+        const key = `${CACHE_CONFIG.PREFIX}${type}_${id}`;
         try {
-            const cachedData = GM_getValue(`${CACHE_CONFIG.PREFIX}${type}_${id}`);
+            const cachedData = GM_getValue(key);
             if (!cachedData) return null;
             const { value, timestamp } = JSON.parse(cachedData);
-            if (Date.now() - timestamp > CACHE_CONFIG.EXPIRATION) return null;
+            if (Date.now() - timestamp > CACHE_CONFIG.EXPIRATION) {
+                GM_deleteValue(key); // remove stale entries so storage doesn't grow forever
+                return null;
+            }
             return value;
         } catch { return null; }
     }
@@ -66,34 +72,48 @@
         });
     }
 
+    // The service answers "xx" / "Country Not Set" when the creator hasn't set a country.
+    // (The flag library's xx.svg is an almost invisible white box.)
+    function isUnknownCountry(countryData) {
+        return countryData.code === 'xx' || /not set/i.test(countryData.name || '');
+    }
+
+    // What to show when the country is unknown.
+    // Must return an element with className 'yt-country-flag' (so it's removed
+    // when you switch videos), or null to show nothing at all.
+    function createPlaceholder(size, margin, countryData) {
+        const globe = document.createElement('span');
+        globe.textContent = '🌐';
+        globe.className = 'yt-country-flag';
+        globe.style.cssText = `font-size: ${size}; line-height: 1; margin-left: ${margin};`;
+        globe.title = countryData.name || 'Country not set';
+        return globe;
+    }
+
     function createFlag(size, margin, countryData) {
+        if (isUnknownCountry(countryData)) {
+            return createPlaceholder(size, margin, countryData);
+        }
+
         const flag = document.createElement('img');
         flag.src = `${FLAG_CONFIG.BASE_URL}${countryData.code}.svg`;
         flag.className = 'yt-country-flag';
         flag.style.cssText = `width: ${size}; height: auto; margin-left: ${margin}; vertical-align: middle; cursor: pointer;`;
         flag.title = countryData.name || '';
+        flag.onerror = () => flag.remove(); // unknown country code -> no broken image icon
         return flag;
     }
 
     async function addFlags() {
-        // 1. Channel Pages
-        const channelElement = document.querySelector('h1.dynamicTextViewModelH1 > span.yt-core-attributed-string')
-            || document.querySelector('#channel-name #text')
-            || document.querySelector('yt-formatted-string.style-scope.ytd-channel-name');
+        // Flags are only shown on video pages
+        if (window.location.pathname !== "/watch") return;
 
-        if (channelElement && !processedElements.has(channelElement)) {
-            processedElements.add(channelElement);
-            const channelMatch = window.location.pathname.match(/(@[\w.-]+|\/channel\/[\w.-]+)/);
-            if (channelMatch) {
-                const channelId = channelMatch[0].replace('/channel/', '').replace('/', '');
-                const countryData = await getCountryData('channel', channelId);
-                if (countryData && countryData.code) {
-                    channelElement.appendChild(createFlag(FLAG_CONFIG.SIZES.channel, FLAG_CONFIG.MARGINS.channel, countryData));
-                }
-            }
-        }
+        // YouTube reuses title elements between videos. If you navigate while a
+        // lookup is in flight, the old result must not be added to the new page.
+        const startUrl = window.location.href;
+        const stillSamePage = () => window.location.href === startUrl;
 
-        // 2. Video Titles
+        // Video title on watch pages
         const videoElement = document.querySelector('ytd-watch-metadata #title yt-formatted-string')
             || document.querySelector('#title yt-formatted-string');
 
@@ -104,27 +124,20 @@
                 const videoId = new URLSearchParams(window.location.search).get('v');
                 if (videoId) {
                     const countryData = await getCountryData('video', videoId);
-                    if (countryData && countryData.code) {
+                    const flag = countryData && countryData.code && stillSamePage()
+                        ? createFlag(FLAG_CONFIG.SIZE, FLAG_CONFIG.MARGIN, countryData)
+                        : null;
+                    if (flag) {
                         videoParent.style.display = 'flex';
                         videoParent.style.alignItems = 'center';
-                        videoParent.appendChild(createFlag(FLAG_CONFIG.SIZES.video, FLAG_CONFIG.MARGINS.video, countryData));
+                        videoParent.appendChild(flag);
                     }
                 }
             }
         }
 
-        // 3. Shorts
-        const shortsElements = document.querySelectorAll('.ytReelChannelBarViewModelChannelName');
-        shortsElements.forEach(async (el) => {
-            if (!processedElements.has(el)) {
-                processedElements.add(el);
-                const shortsId = window.location.pathname.split('/').pop();
-                const countryData = await getCountryData('video', shortsId);
-                if (countryData && countryData.code) {
-                    el.appendChild(createFlag(FLAG_CONFIG.SIZES.shorts, FLAG_CONFIG.MARGINS.shorts, countryData));
-                }
-            }
-        });
+        // Shorts are intentionally not handled (you don't use them, and
+        // preloaded Shorts would get the wrong flag).
     }
 
     let timeout;
