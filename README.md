@@ -6,11 +6,11 @@ A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.t
 
 | Script | Description |
 | --- | --- |
-| [Default Speed 1.30x](scripts/youtube-default-speed.user.js) | Starts every video at 1.30x. You can still change the speed by hand. Skips YouTube Music and live streams. |
-| [Simple Auto-Pause](scripts/youtube-auto-pause.user.js) | Stops videos from autoplaying when opened. Once you click or press a key, it stops interfering. |
+| [Default Speed](scripts/youtube-default-speed.user.js) | Keeps playback at 1.30x. Skips YouTube Music and live streams. |
+| [Simple Auto-Pause](scripts/youtube-auto-pause.user.js) | Stops videos from autoplaying when opened. |
 | [Default 1440p](scripts/youtube-default-1440p.user.js) | Picks 1440p quality, or the closest available resolution. |
 | [5 Row](scripts/youtube-5-row.user.js) | Shows 5 videos per row on the home and subscriptions grids. CSS only. |
-| [Hide Members Only](scripts/youtube-hide-members-only.user.js) | Hides "Members only" and "Members first" videos from grids and lists. Based on a script by Superflyin. |
+| [Hide Members Only](scripts/youtube-hide-members-only.user.js) | Hides "Members only" and "Members first" videos from grids and lists. By Superflyin. |
 | [Country Flag](scripts/youtube-country-flag.user.js) | Shows the creator's country flag next to channel names, video titles and Shorts. |
 
 ## Install
@@ -23,4 +23,5 @@ A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.t
 
 - **Country Flag privacy:** this script sends the ID of each video and channel you open to a third-party service (`channel-info.pages.dev`) to look up the country. Results are cached for 7 days.
 - **Country Flag on Shorts:** YouTube preloads the next Shorts, and they may get the flag of the Short you're currently watching.
+- The `improvements` branch has reviewed versions of these scripts with bug fixes. They haven't been tested yet. Try them before replacing the versions here.
 - These scripts rely on YouTube's page structure, which changes often. If one stops working, the selectors probably need updating.

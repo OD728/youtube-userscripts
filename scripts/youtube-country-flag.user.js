@@ -1,10 +1,8 @@
 // ==UserScript==
 // @name         YouTube Enhancer (Reveal Country Flag Only)
-// @namespace    http://tampermonkey.net/
 // @description  Reveals the Country Flag next to channel names and video titles.
-// @version      1.1
+// @version      1.0
 // @match        *://*.youtube.com/*
-// @connect      channel-info.pages.dev
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -28,15 +26,11 @@
     const processedElements = new Set();
 
     function getFromCache(type, id) {
-        const key = `${CACHE_CONFIG.PREFIX}${type}_${id}`;
         try {
-            const cachedData = GM_getValue(key);
+            const cachedData = GM_getValue(`${CACHE_CONFIG.PREFIX}${type}_${id}`);
             if (!cachedData) return null;
             const { value, timestamp } = JSON.parse(cachedData);
-            if (Date.now() - timestamp > CACHE_CONFIG.EXPIRATION) {
-                GM_deleteValue(key); // remove stale entries so storage doesn't grow forever
-                return null;
-            }
+            if (Date.now() - timestamp > CACHE_CONFIG.EXPIRATION) return null;
             return value;
         } catch { return null; }
     }
@@ -78,16 +72,10 @@
         flag.className = 'yt-country-flag';
         flag.style.cssText = `width: ${size}; height: auto; margin-left: ${margin}; vertical-align: middle; cursor: pointer;`;
         flag.title = countryData.name || '';
-        flag.onerror = () => flag.remove(); // unknown country code -> no broken image icon
         return flag;
     }
 
     async function addFlags() {
-        // YouTube reuses title elements between videos. If you navigate while a
-        // lookup is in flight, the old result must not be added to the new page.
-        const startUrl = window.location.href;
-        const stillSamePage = () => window.location.href === startUrl;
-
         // 1. Channel Pages
         const channelElement = document.querySelector('h1.dynamicTextViewModelH1 > span.yt-core-attributed-string')
             || document.querySelector('#channel-name #text')
@@ -99,7 +87,7 @@
             if (channelMatch) {
                 const channelId = channelMatch[0].replace('/channel/', '').replace('/', '');
                 const countryData = await getCountryData('channel', channelId);
-                if (countryData && countryData.code && stillSamePage()) {
+                if (countryData && countryData.code) {
                     channelElement.appendChild(createFlag(FLAG_CONFIG.SIZES.channel, FLAG_CONFIG.MARGINS.channel, countryData));
                 }
             }
@@ -116,7 +104,7 @@
                 const videoId = new URLSearchParams(window.location.search).get('v');
                 if (videoId) {
                     const countryData = await getCountryData('video', videoId);
-                    if (countryData && countryData.code && stillSamePage()) {
+                    if (countryData && countryData.code) {
                         videoParent.style.display = 'flex';
                         videoParent.style.alignItems = 'center';
                         videoParent.appendChild(createFlag(FLAG_CONFIG.SIZES.video, FLAG_CONFIG.MARGINS.video, countryData));
@@ -132,7 +120,7 @@
                 processedElements.add(el);
                 const shortsId = window.location.pathname.split('/').pop();
                 const countryData = await getCountryData('video', shortsId);
-                if (countryData && countryData.code && stillSamePage()) {
+                if (countryData && countryData.code) {
                     el.appendChild(createFlag(FLAG_CONFIG.SIZES.shorts, FLAG_CONFIG.MARGINS.shorts, countryData));
                 }
             }

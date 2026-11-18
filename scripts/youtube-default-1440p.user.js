@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         YouTube Default 1440p
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.0
 // @description  Automatically sets YouTube video quality to 1440p or the closest available high resolution.
+// @author       You
 // @match        https://www.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @grant        none
@@ -12,50 +13,95 @@
 (function() {
     'use strict';
 
-    // YouTube's internal quality names, in order of preference.
-    // hd2880 = 2880p (5K), highres = 4320p (8K), large = 480p, medium = 360p, small = 240p
-    const QUALITY_ORDER = ['hd1440', 'hd2160', 'hd2880', 'highres', 'hd1080', 'hd720', 'large', 'medium', 'small'];
+    const TARGET_QUALITY = '1440p';
 
-    const RETRY_DELAY_MS = 500;
-    const MAX_RETRIES = 20; // give up after ~10s instead of retrying forever
+    // Fallback hierarchy if 1440p isn't available (tries higher first, then lower)
+    const QUALITY_FALLBACKS = ['2160p', '2880p', 'highres', '1440p', '1080p', '720p', '480p'];
 
     let lastVideoId = '';
 
-    function setVideoQuality(attempt = 0) {
-        // Only on watch pages
-        if (!new URLSearchParams(window.location.search).get('v')) return;
+    function setVideoQuality() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('v');
 
-        // #movie_player is the main player (not a home-page hover preview)
-        const player = document.getElementById('movie_player');
-        const available = player && typeof player.getAvailableQualityLevels === 'function'
-            ? player.getAvailableQualityLevels()
-            : [];
+        // Ensure we are on a watch page and it's a new video
+        if (!videoId) return;
 
-        if (!available || available.length === 0) {
-            if (attempt < MAX_RETRIES) {
-                setTimeout(() => setVideoQuality(attempt + 1), RETRY_DELAY_MS);
-            }
+        const player = document.querySelector('.html5-video-player');
+        if (!player || typeof player.getAvailableQualityLevels !== 'function') {
+            setTimeout(setVideoQuality, 500);
             return;
         }
 
-        const chosen = QUALITY_ORDER.find(q => available.includes(q));
-        if (!chosen || player.getPlaybackQuality() === chosen) return;
+        const availableQualities = player.getAvailableQualityLevels();
+        if (!availableQualities || availableQualities.length === 0) {
+            setTimeout(setVideoQuality, 500);
+            return;
+        }
 
-        // setPlaybackQualityRange is what actually sticks on current YouTube;
-        // setPlaybackQuality is kept as a fallback for older player versions.
-        try { player.setPlaybackQualityRange(chosen, chosen); } catch (e) { /* unavailable */ }
-        try { player.setPlaybackQuality(chosen); } catch (e) { /* unavailable */ }
-    }
+        // Map YouTube's internal quality strings to readable labels
+        // e.g., 'hd1440' -> '1440p', 'hd1080' -> '1080p'
+        const qualityMap = {
+            'highres': '2160p+', // 4K/8K
+            'hd2880': '2880p',
+            'hd2160': '2160p',
+            'hd1440': '1440p',
+            'hd1080': '1080p',
+            'hd720': '720p',
+            'large': '480p',
+            'medium': '360p',
+            'small': '240p'
+        };
 
-    // Runs on first load and on every YouTube in-app navigation
-    function onNavigate() {
-        const videoId = new URLSearchParams(window.location.search).get('v');
-        if (videoId && videoId !== lastVideoId) {
-            lastVideoId = videoId;
-            setTimeout(() => setVideoQuality(), 1000); // wait for the player to spin up
+        // Find the best match based on our fallback list
+        let chosenQuality = null;
+
+        // Try exact match for 1440p first ('hd1440')
+        for (const [internalKey, label] of Object.entries(qualityMap)) {
+            if (label === TARGET_QUALITY && availableQualities.includes(internalKey)) {
+                chosenQuality = internalKey;
+                break;
+            }
+        }
+
+        // If 1440p isn't found, look for fallback options in order of preference
+        if (!chosenQuality) {
+            for (const targetFallback of QUALITY_FALLBACKS) {
+                for (const [internalKey, label] of Object.entries(qualityMap)) {
+                    if (label === targetFallback && availableQualities.includes(internalKey)) {
+                        chosenQuality = internalKey;
+                        break;
+                    }
+                }
+                if (chosenQuality) break;
+            }
+        }
+
+        if (chosenQuality && player.getPlaybackQuality() !== chosenQuality) {
+            player.setPlaybackQuality(chosenQuality);
+            // Forcefully trigger a quality update via local storage API hook if player resists
+            try {
+                player.setPlaybackQualityRange(chosenQuality, chosenQuality);
+            } catch (e) {
+                // Ignore if method is unavailable
+            }
         }
     }
 
-    window.addEventListener('yt-navigate-finish', onNavigate);
-    window.addEventListener('load', onNavigate);
+    // Monitor URL/page changes for single-page application navigation
+    const observer = new MutationObserver(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('v');
+        if (videoId && videoId !== lastVideoId) {
+            lastVideoId = videoId;
+            setTimeout(setVideoQuality, 1000); // Wait for player to spin up
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Initial load execution
+    window.addEventListener('load', () => {
+        setTimeout(setVideoQuality, 1500);
+    });
 })();
