@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         YouTube Default Speed 1.30x
 // @namespace    http://tampermonkey.net/
-// @version      1.1
-// @description  Sets YouTube playback speed to 1.30x (excludes Music and Live)
+// @version      1.2
+// @description  Sets YouTube playback speed to 1.30x on each new video (excludes Music and Live). Manual speed changes are respected.
 // @match        *://*.youtube.com/*
 // @exclude      *://music.youtube.com/*
 // @grant        none
@@ -11,12 +11,37 @@
 (function() {
     'use strict';
 
-    setInterval(() => {
-        const video = document.querySelector('video');
-        const isLive = document.querySelector('.ytp-live-badge[aria-disabled="true"], .ytp-live') != null || window.location.pathname.includes('/live/');
+    const SPEED = 1.30;
+    // YouTube resets the speed when a video or ad starts, so the speed is
+    // enforced for the first few seconds of playback, then left alone so
+    // you can still change it yourself.
+    const ENFORCE_MS = 3000;
 
-        if (video && !isLive && video.playbackRate !== 1.30) {
-            video.playbackRate = 1.30;
+    let currentKey = null;
+    let playingSince = null;
+
+    setInterval(() => {
+        // Main watch player or Shorts player only (not hover previews on the home page)
+        const player = document.querySelector('#movie_player, #shorts-player');
+        const video = player && player.querySelector('video');
+        if (!video) return;
+
+        const isLive = player.querySelector('.ytp-live-badge[aria-disabled="true"], .ytp-live') != null
+            || window.location.pathname.includes('/live/');
+        const isAd = player.classList.contains('ad-showing');
+
+        // A new video (or switching between ad and video) restarts the enforce window
+        const key = window.location.href + (isAd ? '|ad' : '');
+        if (key !== currentKey) {
+            currentKey = key;
+            playingSince = null;
         }
-    }, 1000);
+
+        if (isLive || video.paused) return;
+        if (playingSince === null) playingSince = Date.now();
+
+        if (Date.now() - playingSince < ENFORCE_MS && video.playbackRate !== SPEED) {
+            video.playbackRate = SPEED;
+        }
+    }, 250);
 })();
