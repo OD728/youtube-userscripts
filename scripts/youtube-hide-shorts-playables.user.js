@@ -1,11 +1,18 @@
 // ==UserScript==
 // @name         YouTube Hide Shorts & Playables
-// @namespace    http://tampermonkey.net/
-// @version      1.0
+// @namespace    https://github.com/OD728
+// @version      1.0.1
 // @description  Hides Shorts and YouTube Playables everywhere on YouTube. Shorts links open as normal videos.
+// @author       OD728
+// @license      MIT
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
 // @match        https://www.youtube.com/*
 // @grant        none
 // @run-at       document-start
+// @homepageURL  https://github.com/OD728/youtube-userscripts
+// @supportURL   https://github.com/OD728/youtube-userscripts/issues
+// @downloadURL  https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-hide-shorts-playables.user.js
+// @updateURL    https://raw.githubusercontent.com/OD728/youtube-userscripts/main/scripts/youtube-hide-shorts-playables.user.js
 // ==/UserScript==
 
 (function () {
