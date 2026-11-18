@@ -6,7 +6,7 @@ A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.t
 
 | Script | Description |
 | --- | --- |
-| [Default Speed](scripts/youtube-default-speed.user.js) | Keeps playback at 1.30x. Skips YouTube Music and live streams. |
+| [Default Speed](scripts/youtube-default-speed.user.js) | Starts every video at 1.30x. You can still change the speed by hand. Skips YouTube Music and live streams. |
 | [Simple Auto-Pause](scripts/youtube-auto-pause.user.js) | Stops videos from autoplaying when opened. |
 | [Default 1440p](scripts/youtube-default-1440p.user.js) | Picks 1440p quality, or the closest available resolution. |
 | [5 Row](scripts/youtube-5-row.user.js) | Shows 5 videos per row on the home and subscriptions grids. CSS only. |
