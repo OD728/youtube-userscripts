@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Simple Auto-Pause
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Prevents YouTube videos from autoplaying when opened.
 // @match        *://*.youtube.com/*
 // @grant        none
@@ -10,21 +10,29 @@
 (function() {
     'use strict';
 
-    let hasPaused = false;
+    // "Armed" = keep pausing until you interact with the page.
+    // Re-armed every time you open a new video (YouTube's internal navigation).
+    let armed = true;
 
-    // Reset our tracker every time you click a new video (YouTube's internal navigation)
     window.addEventListener('yt-navigate-start', () => {
-        hasPaused = false;
+        armed = true;
     });
 
-    // Check continuously for the video element to load
-    setInterval(() => {
-        const video = document.querySelector('video');
+    // Any real click or key press means you're in control: stop pausing.
+    // (Clicking a thumbnail disarms, but the navigation that follows re-arms.)
+    const disarm = (e) => {
+        if (e.isTrusted) armed = false;
+    };
+    window.addEventListener('pointerdown', disarm, true);
+    window.addEventListener('keydown', disarm, true);
 
-        // If the video exists, is playing, and we haven't paused it yet...
-        if (video && !video.paused && !hasPaused) {
-            video.pause();   // Pause the video
-            hasPaused = true; // Mark as paused so we don't stop you from clicking play later
+    setInterval(() => {
+        // Only on normal watch pages; Shorts and home-page hover previews are left alone
+        if (!armed || window.location.pathname !== '/watch') return;
+
+        const video = document.querySelector('#movie_player video');
+        if (video && !video.paused) {
+            video.pause();
         }
     }, 100);
 })();
