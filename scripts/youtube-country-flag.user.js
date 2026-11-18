@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         YouTube Enhancer (Reveal Country Flag Only)
 // @namespace    http://tampermonkey.net/
-// @description  Reveals the Country Flag next to channel names and video titles.
-// @version      1.2
+// @description  Reveals the Country Flag next to video titles.
+// @version      1.3
 // @match        *://*.youtube.com/*
 // @connect      channel-info.pages.dev
 // @grant        GM_xmlhttpRequest
@@ -16,8 +16,8 @@
 
     const FLAG_CONFIG = {
         BASE_URL: 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/flags/4x3/',
-        SIZES: { channel: '28px', video: '22px' },
-        MARGINS: { channel: '12px', video: '10px' }
+        SIZE: '22px',
+        MARGIN: '10px'
     };
 
     const CACHE_CONFIG = {
@@ -83,29 +83,15 @@
     }
 
     async function addFlags() {
+        // Flags are only shown on video pages
+        if (window.location.pathname !== "/watch") return;
+
         // YouTube reuses title elements between videos. If you navigate while a
         // lookup is in flight, the old result must not be added to the new page.
         const startUrl = window.location.href;
         const stillSamePage = () => window.location.href === startUrl;
 
-        // 1. Channel Pages
-        const channelElement = document.querySelector('h1.dynamicTextViewModelH1 > span.yt-core-attributed-string')
-            || document.querySelector('#channel-name #text')
-            || document.querySelector('yt-formatted-string.style-scope.ytd-channel-name');
-
-        if (channelElement && !processedElements.has(channelElement)) {
-            processedElements.add(channelElement);
-            const channelMatch = window.location.pathname.match(/(@[\w.-]+|\/channel\/[\w.-]+)/);
-            if (channelMatch) {
-                const channelId = channelMatch[0].replace('/channel/', '').replace('/', '');
-                const countryData = await getCountryData('channel', channelId);
-                if (countryData && countryData.code && stillSamePage()) {
-                    channelElement.appendChild(createFlag(FLAG_CONFIG.SIZES.channel, FLAG_CONFIG.MARGINS.channel, countryData));
-                }
-            }
-        }
-
-        // 2. Video Titles
+        // Video title on watch pages
         const videoElement = document.querySelector('ytd-watch-metadata #title yt-formatted-string')
             || document.querySelector('#title yt-formatted-string');
 
@@ -119,7 +105,7 @@
                     if (countryData && countryData.code && stillSamePage()) {
                         videoParent.style.display = 'flex';
                         videoParent.style.alignItems = 'center';
-                        videoParent.appendChild(createFlag(FLAG_CONFIG.SIZES.video, FLAG_CONFIG.MARGINS.video, countryData));
+                        videoParent.appendChild(createFlag(FLAG_CONFIG.SIZE, FLAG_CONFIG.MARGIN, countryData));
                     }
                 }
             }
