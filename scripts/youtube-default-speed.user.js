@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         YouTube Default Speed 1.30x
+// @name         YouTube Default Speed 1.25x
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  Sets YouTube playback speed to 1.30x on each new video (excludes Music and Live). Manual speed changes are respected.
 // @match        *://*.youtube.com/*
 // @exclude      *://music.youtube.com/*
@@ -21,8 +21,11 @@
     let playingSince = null;
 
     setInterval(() => {
-        // Main watch player or Shorts player only (not hover previews on the home page)
-        const player = document.querySelector('#movie_player, #shorts-player');
+        // Pick the player for the current page. YouTube keeps the hidden watch
+        // player around on Shorts, so we can't just take whichever comes first.
+        // (Hover previews on the home page are left alone.)
+        const onShorts = window.location.pathname.startsWith('/shorts');
+        const player = document.querySelector(onShorts ? '#shorts-player' : '#movie_player');
         const video = player && player.querySelector('video');
         if (!video) return;
 
