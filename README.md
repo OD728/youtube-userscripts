@@ -21,6 +21,12 @@ A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.t
 2. Open a script file above, click **Raw**, and your manager will offer to install it.
    Or create a new script in the manager and paste the contents in.
 
+Every script updates itself from this repository when a new version is published here.
+
+## License
+
+MIT, except **5 Row** (based on work by Dean) and **Hide Members Only** (based on work by Superflyin), which follow their original authors' terms.
+
 ## Notes
 
 - **Country Flag privacy:** this script sends the ID of each video you open to a third-party service (`channel-info.pages.dev`) to look up the country. Results are cached for 7 days.
