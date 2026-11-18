@@ -2,7 +2,7 @@
 // @name         YouTube Enhancer (Reveal Country Flag Only)
 // @namespace    http://tampermonkey.net/
 // @description  Reveals the Country Flag next to channel names and video titles.
-// @version      1.1
+// @version      1.2
 // @match        *://*.youtube.com/*
 // @connect      channel-info.pages.dev
 // @grant        GM_xmlhttpRequest
@@ -16,8 +16,8 @@
 
     const FLAG_CONFIG = {
         BASE_URL: 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/flags/4x3/',
-        SIZES: { channel: '28px', video: '22px', shorts: '20px' },
-        MARGINS: { channel: '12px', video: '10px', shorts: '8px' }
+        SIZES: { channel: '28px', video: '22px' },
+        MARGINS: { channel: '12px', video: '10px' }
     };
 
     const CACHE_CONFIG = {
@@ -125,18 +125,8 @@
             }
         }
 
-        // 3. Shorts
-        const shortsElements = document.querySelectorAll('.ytReelChannelBarViewModelChannelName');
-        shortsElements.forEach(async (el) => {
-            if (!processedElements.has(el)) {
-                processedElements.add(el);
-                const shortsId = window.location.pathname.split('/').pop();
-                const countryData = await getCountryData('video', shortsId);
-                if (countryData && countryData.code && stillSamePage()) {
-                    el.appendChild(createFlag(FLAG_CONFIG.SIZES.shorts, FLAG_CONFIG.MARGINS.shorts, countryData));
-                }
-            }
-        });
+        // Shorts are intentionally not handled (you don't use them, and
+        // preloaded Shorts would get the wrong flag).
     }
 
     let timeout;
