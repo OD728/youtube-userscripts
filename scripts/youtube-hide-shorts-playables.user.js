@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         YouTube Hide Shorts & Playables
 // @namespace    https://github.com/OD728
-// @version      1.2.0
-// @description  Hides Shorts, YouTube Playables and YouTube promos (featured shelves, Premium banners, popups, sponsored items, merch). Shorts links open as normal videos.
+// @version      1.3.0
+// @description  Hides Shorts, YouTube Playables and YouTube promos and ad panels (featured shelves, Premium banners, popups, sponsored items, merch). Shorts links open as normal videos.
 // @author       OD728
 // @license      MIT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
@@ -92,6 +92,16 @@
         /* Merch and ticket shelves under videos */
         ytd-merch-shelf-renderer,
         ytd-ticket-shelf-renderer {
+            display: none !important;
+        }
+
+        /* Ad panels and ad banners next to the video (moved here from your
+           YouTube CSS). A separate rule, so a selector YouTube breaks here
+           can't cancel all the rules above. */
+        [target-id="engagement-panel-ads"],
+        ytd-ads-engagement-panel-content-renderer,
+        .ytwPanelAdHeaderImageLockupViewModelHost,
+        .ytwTopBannerImageTextIconButtonedLayoutViewModelHostMetadataMenu {
             display: none !important;
         }
     `;
