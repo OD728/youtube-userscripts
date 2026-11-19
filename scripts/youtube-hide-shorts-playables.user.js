@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         YouTube Hide Shorts & Playables
 // @namespace    https://github.com/OD728
-// @version      1.0.1
-// @description  Hides Shorts and YouTube Playables everywhere on YouTube. Shorts links open as normal videos.
+// @version      1.1.0
+// @description  Hides Shorts, YouTube Playables and "YouTube featured" promo shelves. Shorts links open as normal videos.
 // @author       OD728
 // @license      MIT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
@@ -60,7 +60,13 @@
         ytd-rich-section-renderer:has(ytd-mini-game-card-view-model),
         ytd-rich-shelf-renderer:has(a[href*="/playables"]),
         ytd-guide-entry-renderer:has(a[href*="/playables"]),
-        ytd-mini-guide-entry-renderer:has(a[href*="/playables"]) {
+        ytd-mini-guide-entry-renderer:has(a[href*="/playables"]),
+
+        /* "YouTube featured" promo shelves (e.g. "Your home for Grand Theft Auto VI").
+           YouTube marks them with a featured-promo attribute in every language. */
+        ytd-shelf-renderer[featured-promo],
+        ytd-rich-shelf-renderer[featured-promo],
+        ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[featured-promo]) {
             display: none !important;
         }
     `;
