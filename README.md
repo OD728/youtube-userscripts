@@ -1,6 +1,6 @@
 # YouTube Userscripts
 
-A collection of userscripts for YouTube. Works with [Tampermonkey](https://www.tampermonkey.net/), Violentmonkey, or any userscript manager.
+**YouTube userscripts:** a collection of userscripts for YouTube. Works with [Tampermonkey](https://www.tampermonkey.net/), Violentmonkey, or any userscript manager.
 
 ## Scripts
 
