@@ -12,7 +12,7 @@
 | [5 Row](scripts/youtube-5-row.user.js) | Shows 5 videos per row on the home and subscriptions grids. CSS only. |
 | [Hide Members Only](scripts/youtube-hide-members-only.user.js) | Hides "Members only" and "Members first" videos from grids and lists. Based on a script by Superflyin. |
 | [Hide Shorts & Playables](scripts/youtube-hide-shorts-playables.user.js) | Hides Shorts (shelves, results, menu entry, channel tab), the YouTube Playables games shelf, and YouTube promos and ads: "YouTube featured" shelves, Premium banners and pop-ups, sponsored items, ad panels, merch and ticket shelves. Shorts links open as normal videos. |
-| [Clean Interface](scripts/youtube-clean-sidebar.user.js) | Hides clutter: sidebar extras (Explore, More from YouTube, Report history, footer), header buttons (voice search, Create, Notifications), video action buttons (Join, Share, Save, Download…) and AI/transcript extras. |
+| [Clean Interface](scripts/youtube-clean-sidebar.user.js) | Hides clutter: sidebar extras (Explore, More from YouTube, Report history, footer), header buttons (voice search, Create, Notifications), video action buttons (Join, Share, Save, Download…), AI/transcript extras, and Mix playlists and music videos in the home feed, channel pages and watch-page sidebar (search results still show them). |
 | [Country Flag](scripts/youtube-country-flag.user.js) | Shows the creator's country flag next to video titles, or 🌐 if the creator hasn't set a country. |
 
 ## Install

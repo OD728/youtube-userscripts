@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         YouTube Clean Interface
 // @namespace    https://github.com/OD728
-// @version      1.1.0
-// @description  Hides clutter: sidebar extras (Explore, More from YouTube, Report history, footer), header buttons, video action buttons and AI/transcript extras.
+// @version      1.2.0
+// @description  Hides clutter: sidebar extras (Explore, More from YouTube, Report history, footer), header buttons, video action buttons, AI/transcript extras, and Mixes and music videos in feeds and recommendations.
 // @author       OD728
 // @license      MIT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
@@ -82,7 +82,40 @@
         }
     `;
 
+    // Mixes and music videos in the home feed, channel pages and the
+    // watch-page sidebar. Search results are left alone, so music you
+    // search for on purpose still shows up.
+    // YouTube links both "Mix - ..." playlists and music videos (the ones
+    // with the music-note duration badge) as a radio:
+    // /watch?v=ID&list=RD...&start_radio=1. That works in every language.
+    const musicCss = `
+        /* Mix playlists, older layout */
+        ytd-browse ytd-radio-renderer,
+        ytd-browse ytd-grid-radio-renderer,
+        ytd-watch-flexy ytd-compact-radio-renderer,
+
+        /* Mixes and music videos, by their radio link */
+        ytd-rich-item-renderer:has(a[href*="start_radio=1"]),
+        ytd-rich-item-renderer:has(a[href*="list=RD"]),
+        ytd-browse ytd-grid-video-renderer:has(a[href*="start_radio=1"]),
+        ytd-watch-flexy ytd-compact-video-renderer:has(a[href*="start_radio=1"]),
+        ytd-browse yt-lockup-view-model:has(a[href*="start_radio=1"]),
+        ytd-browse yt-lockup-view-model:has(a[href*="list=RD"]),
+        ytd-watch-flexy #secondary yt-lockup-view-model:has(a[href*="start_radio=1"]),
+        ytd-watch-flexy #secondary yt-lockup-view-model:has(a[href*="list=RD"]) {
+            display: none !important;
+        }
+
+        /* Backup: the music-note icon in the duration badge. Its own rule,
+           so a change here can't break the rules above. */
+        ytd-rich-item-renderer:has(badge-shape path[d^="M5.5 1.383V6.88"]),
+        ytd-browse yt-lockup-view-model:has(badge-shape path[d^="M5.5 1.383V6.88"]),
+        ytd-watch-flexy #secondary yt-lockup-view-model:has(badge-shape path[d^="M5.5 1.383V6.88"]) {
+            display: none !important;
+        }
+    `;
+
     const style = document.createElement('style');
-    style.textContent = css;
+    style.textContent = css + musicCss;
     (document.head || document.documentElement).appendChild(style);
 })();
