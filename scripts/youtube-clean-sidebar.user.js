@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         YouTube Clean Interface
 // @namespace    https://github.com/OD728
-// @version      1.2.0
-// @description  Hides clutter: sidebar extras (Explore, More from YouTube, Report history, footer), header buttons, video action buttons, AI/transcript extras, and Mixes and music videos in feeds and recommendations.
+// @version      1.2.1
+// @description  Hides clutter: sidebar extras (Explore, More from YouTube, Report history, footer), header buttons, video action buttons, AI/transcript extras, and Mixes, music videos and movies in feeds and recommendations.
 // @author       OD728
 // @license      MIT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
@@ -80,15 +80,30 @@
         .ytCollectionsStackCollectionStack1 {
             display: none !important;
         }
+
+        /* YouTube movies ("Free of charge" / price badge, age rating like
+           FSK 12). Their own element, the "Commerce" badge style, or a link
+           to the official "YouTube Movies & TV" channel. */
+        ytd-browse ytd-movie-renderer,
+        ytd-browse ytd-grid-movie-renderer,
+        ytd-watch-flexy ytd-compact-movie-renderer,
+        ytd-rich-item-renderer:has(ytd-movie-renderer),
+        ytd-rich-item-renderer:has(badge-shape.ytBadgeShapeCommerce),
+        ytd-rich-item-renderer:has(a[href="/channel/UCuVPpxrm2VAgpH3Ktln4HXg"]),
+        ytd-browse yt-lockup-view-model:has(badge-shape.ytBadgeShapeCommerce),
+        ytd-watch-flexy #secondary yt-lockup-view-model:has(badge-shape.ytBadgeShapeCommerce),
+        ytd-watch-flexy #secondary yt-lockup-view-model:has(a[href="/channel/UCuVPpxrm2VAgpH3Ktln4HXg"]) {
+            display: none !important;
+        }
     `;
 
-    // Mixes and music videos in the home feed, channel pages and the
-    // watch-page sidebar. Search results are left alone, so music you
-    // search for on purpose still shows up.
+    // Mixes, music videos and YouTube movies in the home feed, channel
+    // pages and the watch-page sidebar. Search results are left alone, so
+    // something you search for on purpose still shows up.
     // YouTube links both "Mix - ..." playlists and music videos (the ones
     // with the music-note duration badge) as a radio:
     // /watch?v=ID&list=RD...&start_radio=1. That works in every language.
-    const musicCss = `
+    const feedCss = `
         /* Mix playlists, older layout */
         ytd-browse ytd-radio-renderer,
         ytd-browse ytd-grid-radio-renderer,
@@ -113,9 +128,24 @@
         ytd-watch-flexy #secondary yt-lockup-view-model:has(badge-shape path[d^="M5.5 1.383V6.88"]) {
             display: none !important;
         }
+
+        /* YouTube movies ("Free of charge" / price badge, age rating like
+           FSK 12). Their own element, the "Commerce" badge style, or a link
+           to the official "YouTube Movies & TV" channel. */
+        ytd-browse ytd-movie-renderer,
+        ytd-browse ytd-grid-movie-renderer,
+        ytd-watch-flexy ytd-compact-movie-renderer,
+        ytd-rich-item-renderer:has(ytd-movie-renderer),
+        ytd-rich-item-renderer:has(badge-shape.ytBadgeShapeCommerce),
+        ytd-rich-item-renderer:has(a[href="/channel/UCuVPpxrm2VAgpH3Ktln4HXg"]),
+        ytd-browse yt-lockup-view-model:has(badge-shape.ytBadgeShapeCommerce),
+        ytd-watch-flexy #secondary yt-lockup-view-model:has(badge-shape.ytBadgeShapeCommerce),
+        ytd-watch-flexy #secondary yt-lockup-view-model:has(a[href="/channel/UCuVPpxrm2VAgpH3Ktln4HXg"]) {
+            display: none !important;
+        }
     `;
 
     const style = document.createElement('style');
-    style.textContent = css + musicCss;
+    style.textContent = css + feedCss;
     (document.head || document.documentElement).appendChild(style);
 })();
