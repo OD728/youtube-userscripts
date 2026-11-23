@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Clean Interface
 // @namespace    https://github.com/OD728
-// @version      1.2.1
+// @version      1.3.0
 // @description  Hides clutter: sidebar extras (Explore, More from YouTube, Report history, footer), header buttons, video action buttons, AI/transcript extras, and Mixes, music videos and movies in feeds and recommendations.
 // @author       OD728
 // @license      MIT
@@ -38,6 +38,7 @@
            (CSS doesn't allow :has() inside :has().) */
         ytd-guide-entry-renderer:has(a[href^="/reporthistory"]),
         ytd-guide-entry-renderer:has(a[title="Report history"]),
+        ytd-guide-entry-renderer:has(a[title="Meldeverlauf"]),
         ytd-guide-section-renderer:has(a[href^="/reporthistory"]):not(:has(a[href^="/account"])),
 
         /* Footer: About, Press, Copyright ... Terms, Privacy ... (c) Google LLC */
@@ -46,11 +47,17 @@
         }
 
         /* ---------- Header ----------
-           Voice search, Create, Notifications, country code, search button */
+           Voice search, Create, Notifications, country code, search button.
+           Element names and ids work in any language; the aria-labels are
+           listed in English and German. */
         #voice-search-button.ytd-masthead,
+        ytd-masthead ytd-notification-topbar-button-renderer,
         button[aria-label="Search with your voice"],
+        button[aria-label="Sprachsuche"],
         button[aria-label="Create"],
+        button[aria-label="Erstellen"],
         button[aria-label="Notifications"],
+        button[aria-label="Benachrichtigungen"],
         #country-code,
         .ytSearchboxComponentSearchButton,
         .ytSearchboxComponentSearchButtonDark {
@@ -58,13 +65,23 @@
         }
 
         /* ---------- Buttons under the video ----------
-           Join, Share, Thanks, Clip, Download, Save, and the extra button row */
+           Join, Share, Thanks, Clip, Download, Save, and the extra button row.
+           Join and Download by element/id (any language), the rest by
+           aria-label in English and German. */
+        ytd-watch-flexy #sponsor-button,
+        ytd-watch-flexy ytd-download-button-renderer,
         button[aria-label="Join this channel"],
+        button[aria-label="Kanalmitglied werden"],
+        button[aria-label="Mitglied werden"],
         ytd-watch-flexy ytd-menu-renderer button[aria-label="Share"],
+        ytd-watch-flexy ytd-menu-renderer button[aria-label="Teilen"],
         ytd-watch-flexy ytd-menu-renderer button[aria-label="Thanks"],
+        ytd-watch-flexy ytd-menu-renderer button[aria-label="Danke"],
         ytd-watch-flexy ytd-menu-renderer button[aria-label="Clip"],
         ytd-watch-flexy ytd-menu-renderer button[aria-label="Download"],
+        ytd-watch-flexy ytd-menu-renderer button[aria-label="Herunterladen"],
         ytd-watch-flexy ytd-menu-renderer button[aria-label="Save"],
+        ytd-watch-flexy ytd-menu-renderer button[aria-label="Speichern"],
         ytd-watch-flexy #flexible-item-buttons {
             display: none !important;
         }
